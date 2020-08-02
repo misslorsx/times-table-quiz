@@ -1,3 +1,4 @@
+const ANSWER_TIME = 30;
 var Game = function() {
     var self = this;
 
@@ -11,7 +12,25 @@ var Game = function() {
     this.answerDeadline = null;
     this.answerTime = null;
 
+    this.state_beforeStart = "beforeStart";
+    this.state_running = "running";
+    this.state_finished = "finished";
+    this.state = this.state_beforeStart;
+    this.setStateRunning = function() {
+        self.state = self.state_running;
+    }
+    this.isStateRunning = function() {
+        return (self.state === self.state_running);
+    }
+    this.isStateFinished = function() {
+        return (self.state === self.state_finished);
+    }
+    this.setStateFinished = function() {
+        self.state = self.state_finished;
+    }
+
     this.start = function() {
+        self.setStateRunning();
         self.score = 0;
         self.possibleOptions = [];
         self.currentAnswer = null;
@@ -56,6 +75,8 @@ var Game = function() {
         self.currentAnswer = partA * partB;
 
         // set the answer deadline
+        let currentTime = Math.round((new Date()).getTime() / 1000);
+        self.answerDeadline = currentTime + ANSWER_TIME;
     }
 
     this.endGame = function(answer) {
@@ -64,11 +85,27 @@ var Game = function() {
     };
 
     this.tick = function() {
+
         console.log("tick");
+
+        // compare the current time to the answer deadline
+        // if current time > the answerdeadline
+        // change state to finished
+        let currentTime = Math.round((new Date()).getTime() / 1000);
+        if (currentTime > self.answerDeadline) {
+            self.setStateFinished()
+        }
+
 
     };
 
     this.getCurrentQuestion = function() {
         return self.currentQuestion;
-    }
+    };
+    this.getCurrentScore = function() {
+        return self.score;
+    };
+    this.getAnswerDeadline = function() {
+        return self.answerDeadline;
+    };
 }
